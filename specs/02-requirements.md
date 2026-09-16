@@ -13,6 +13,7 @@
 | RF-07 | O sistema deve permitir excluir uma tarefa. |
 | RF-08 | O sistema deve responder com erro 404 ao operar sobre uma tarefa inexistente. |
 | RF-09 | O sistema deve responder com erro 400 quando o título da tarefa não for informado na criação. |
+| RF-10 | O sistema deve fornecer uma interface web básica (HTML/CSS/JS) que permita criar, listar, concluir/reabrir e excluir tarefas, consumindo os mesmos endpoints da API. |
 
 ## Requisitos não funcionais
 
@@ -25,6 +26,7 @@
 | RNF-05 | A porta da aplicação deve ser configurável via variável de ambiente `PORT` (necessário porque a orquestração de containers costuma injetar a porta dinamicamente). |
 | RNF-06 | Todo push na branch principal deve disparar automaticamente: build, testes, build da imagem Docker e deploy na instância AWS configurada — sem etapa manual, exceto o provisionamento inicial da instância. |
 | RNF-07 | Toda alteração de código deve passar pelos testes automatizados no GitHub Actions antes de poder ser mesclada — falha de teste bloqueia o CD. |
+| RNF-08 | O pipeline deve varrer vulnerabilidades de segurança conhecidas antes do deploy: dependências Node (`npm audit`) no CI e a imagem Docker final (Trivy) no CD. Vulnerabilidade crítica/alta com correção disponível bloqueia o deploy. |
 
 ## Histórias de usuário (referência)
 

@@ -16,4 +16,8 @@ jobs:
           cache: "npm"
 
       - run: npm ci
+
+      - name: Scanner de segurança das dependências (npm audit)
+        run: npm audit --audit-level=high
+
       - run: npm test

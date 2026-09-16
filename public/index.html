@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Todo API</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main>
+    <h1>Minhas tarefas</h1>
+
+    <form id="task-form">
+      <input type="text" id="title" placeholder="Título da tarefa" required maxlength="200" />
+      <input type="text" id="description" placeholder="Descrição (opcional)" maxlength="1000" />
+      <button type="submit">Adicionar</button>
+    </form>
+
+    <div class="filters">
+      <button class="filter-btn active" data-filter="all">Todas</button>
+      <button class="filter-btn" data-filter="false">Pendentes</button>
+      <button class="filter-btn" data-filter="true">Concluídas</button>
+    </div>
+
+    <ul id="task-list"></ul>
+    <p id="empty-state" hidden>Nenhuma tarefa.</p>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

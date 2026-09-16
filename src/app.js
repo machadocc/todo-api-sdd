@@ -1,3 +1,4 @@
+const path = require("path");
 const express = require("express");
 const { TaskStore } = require("./store");
 const { createTasksRouter } = require("./routes/tasks");
@@ -10,6 +11,8 @@ function createApp({ dataFile }) {
 
   const store = new TaskStore(dataFile);
   app.use("/tasks", createTasksRouter(store));
+
+  app.use(express.static(path.join(__dirname, "..", "public")));
 
   return app;
 }

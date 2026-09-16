@@ -34,6 +34,9 @@
 - `src/server.js` — único ponto que efetivamente chama `app.listen()`, lendo
   `PORT` do ambiente (RNF-05). Separado de `app.js` justamente para os testes
   não precisarem abrir uma porta de rede.
+- `public/` — frontend básico (RF-10, ver `07-frontend.md`), servido como
+  arquivos estáticos pelo próprio `app.js` via `express.static`. Mesma
+  origem da API: sem CORS, sem servidor HTTP adicional, sem novo recurso AWS.
 
 ## Decisão: arquivo JSON em vez de banco de dados
 
@@ -62,7 +65,11 @@ Disparado em todo `push` e `pull_request`. Passos:
 1. Checkout do código.
 2. Setup do Node.js 20.
 3. `npm ci` (instalação determinística a partir do lockfile).
-4. `npm test` (Jest + Supertest, valida o contrato da API).
+4. `npm audit --audit-level=high` — varredura de segurança das dependências
+   (SCA — Software Composition Analysis). Falha o job se houver
+   vulnerabilidade de severidade alta/crítica com correção disponível
+   (RNF-08).
+5. `npm test` (Jest + Supertest, valida o contrato da API).
 
 Se qualquer passo falhar, o workflow falha e (em um PR) bloqueia o merge
 (RNF-07).
@@ -72,11 +79,17 @@ Se qualquer passo falhar, o workflow falha e (em um PR) bloqueia o merge
 Disparado em `push` para a branch `main`, e só roda se o `ci.yml` daquele
 commit passou (via `workflow_run`, para nunca publicar código com teste
 quebrado). Passos:
-1. Build da imagem Docker.
-2. Push da imagem para o GitHub Container Registry (`ghcr.io`), autenticado
-   com o `GITHUB_TOKEN` automático da Action — não exige nenhum segredo
-   adicional para essa etapa.
-3. Conexão via SSH na instância EC2 (usando os segredos `EC2_HOST`,
+1. Build da imagem Docker (local, sem publicar ainda).
+2. **Scan de segurança da imagem (Trivy)** — varre a imagem construída em
+   busca de vulnerabilidades conhecidas no SO base e nas dependências
+   empacotadas. Severidade crítica/alta com correção disponível interrompe o
+   workflow **antes do push** — nenhuma imagem vulnerável chega a ser
+   publicada ou implantada (RNF-08). Vulnerabilidades sem correção disponível
+   ainda (`ignore-unfixed`) não bloqueiam, pois não haveria ação possível.
+3. Push da imagem (só executa se o scan passou) para o GitHub Container
+   Registry (`ghcr.io`), autenticado com o `GITHUB_TOKEN` automático da
+   Action — não exige nenhum segredo adicional para essa etapa.
+4. Conexão via SSH na instância EC2 (usando os segredos `EC2_HOST`,
    `EC2_SSH_KEY`, `EC2_USER` configurados no repositório) e execução de um
    script remoto que: faz `docker pull` da imagem nova, para o container
    antigo e sobe o novo com o mesmo volume de dados (`data/`), preservando as

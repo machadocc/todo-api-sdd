@@ -12,13 +12,14 @@ antes do código e são a fonte de verdade do contrato implementado.
 4. [specs/04-api-contract.md](specs/04-api-contract.md) — contrato de cada endpoint.
 5. [specs/05-architecture.md](specs/05-architecture.md) — arquitetura e pipeline CI/CD.
 6. [specs/06-deploy-aws.md](specs/06-deploy-aws.md) — passo a passo de deploy na AWS EC2.
+7. [specs/07-frontend.md](specs/07-frontend.md) — interface web básica.
 
 ## Rodando localmente
 
 ```bash
 npm install
 npm test        # roda a suíte Jest + Supertest
-npm start        # sobe em http://localhost:3000
+npm start        # sobe em http://localhost:3000 (API + frontend em /)
 ```
 
 ## Rodando com Docker
@@ -30,11 +31,14 @@ curl http://localhost:3000/health
 
 ## Pipeline
 
-- **CI** ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)): roda os
-  testes em todo push e pull request.
+- **CI** ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)): a cada push
+  e pull request, instala dependências, roda `npm audit` (scanner de
+  vulnerabilidades das dependências) e a suíte de testes.
 - **CD** ([`.github/workflows/cd.yml`](.github/workflows/cd.yml)): a cada push
-  na `main` que passar no CI, builda a imagem, publica no GitHub Container
-  Registry e faz deploy via SSH na instância AWS EC2 (configuração em
+  na `main` que passar no CI, builda a imagem, roda o **Trivy** (scanner de
+  vulnerabilidades da imagem — bloqueia o deploy se achar algo crítico/alto
+  com correção disponível), publica no GitHub Container Registry e faz
+  deploy via SSH na instância AWS EC2 (configuração em
   [specs/06-deploy-aws.md](specs/06-deploy-aws.md)).
 
 ## Exemplos de uso
